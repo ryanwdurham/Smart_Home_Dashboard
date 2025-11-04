@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Smart Haven — Mobile Smart Home Simulator (Fixed)</title>
+<style>
+  :root{
+    --bg:#071022; --card:#0f1724; --muted:#94a3b8; --accent:#60a5fa; --accent-2:#7c3aed;
+    --ok:#34d399; --danger:#fb7185; --glass: rgba(255,255,255,0.03);
+    --card-radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background:linear-gradient(180deg,#041025 0%, #06102a 100%); color:#e6eef8; padding:16px;
+  }
+  header{display:flex; gap:12px; align-items:center; justify-content:space-between; margin-bottom:12px;}
+  .brand{display:flex; gap:10px; align-items:center;}
+  .logo{width:48px; height:48px; border-radius:10px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); display:flex; align-items:center; justify-content:center; font-weight:700; color:white; box-shadow:0 6px 18px rgba(12,16,30,0.6)}
+  h1{font-size:18px;margin:0}
+  .top-actions{display:flex; gap:8px; align-items:center;}
+  .mode-btn{background:var(--glass); border:1px solid rgba(255,255,255,0.03); color:var(--muted); padding:8px 10px; border-radius:10px; font-weight:600; font-size:13px}
+  .mode-btn.active{color:#071022;background:white}
+
+  main{display:grid; grid-template-columns: 1fr; gap:12px;}
+  .grid { display:grid; grid-template-columns: 1fr; gap:12px; }
+  @media(min-width:820px){ main{grid-template-columns: 2fr 320px;} .grid{grid-template-columns:repeat(2, 1fr);} }
+
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius: var(--card-radius); padding:12px; box-shadow: 0 6px 18px rgba(3,8,20,0.6); border: 1px solid rgba(255,255,255,0.02);
+  }
+  .room-card{margin-bottom:12px;}
+  .room-card h2{margin:0 0 8px 0; font-size:16px; color:#f8fafc}
+  .devices{display:flex; flex-direction:column; gap:8px}
+  .device-row{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px; border-radius:10px; background:rgba(255,255,255,0.01);}
+  .device-left{display:flex; align-items:center; gap:12px; min-width:0}
+  .icon{width:44px; height:44px; background:rgba(255,255,255,0.02); border-radius:8px; display:flex;align-items:center;justify-content:center;font-weight:700; font-size:18px; color:var(--muted)}
+  .device-name{min-width:0; overflow:hidden}
+  .device-name small{display:block; color:var(--muted); font-size:12px}
+  .device-controls{display:flex; gap:8px; align-items:center}
+
+  button.btn{background:transparent; border:1px solid rgba(255,255,255,0.05); color:var(--accent); padding:8px 10px; border-radius:10px; font-weight:700;}
+  button.btn.primary{background:var(--accent); color:#072131; border:none}
+  .pill{font-size:12px;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.02); color:var(--muted)}
+
+  input[type=range]{-webkit-appearance:none;width:140px;margin:0}
+  input[type=range]::-webkit-slider-runnable-track{height:6px;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:6px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:white;margin-top:-6px;box-shadow:0 2px 6px rgba(0,0,0,0.4)}
+  .color-input{width:36px;height:36px;border-radius:8px;border:none;padding:0}
+
+  .log { font-family: monospace; max-height:360px; overflow:auto; padding:10px; background: rgba(255,255,255,0.01); border-radius:10px; color:var(--muted) }
+  .log-entry{padding:6px 0;border-bottom:1px dashed rgba(255,255,255,0.02); font-size:13px}
+  .rules-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .form-row{display:flex;gap:8px;flex-wrap:wrap}
+  select, input[type=text]{background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted);padding:8px;border-radius:8px}
+  .small{font-size:12px;color:var(--muted)}
+  footer{margin-top:12px;text-align:center;color:var(--muted);font-size:13px}
+  @media(max-width:420px){
+    .icon{width:40px;height:40px}
+    .device-controls{flex-direction:column}
+    input[type=range]{width:100px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">SH</div>
+    <div>
+      <h1>Smart Haven</h1>
+      <div class="small">Mobile Smart Home Simulator</div>
+    </div>
+  </div>
+  <div class="top-actions">
+    <button class="mode-btn" id="modeMorning">Morning</button>
+    <button class="mode-btn" id="modeNight">Night</button>
+    <button class="mode-btn" id="modeAway">Away</button>
+  </div>
+</header>
+
+<main>
+  <section class="grid">
+    <div id="roomsContainer" class="card"></div>
+
+    <aside class="card" style="display:flex;flex-direction:column;gap:12px;">
+      <div>
+        <h2 style="margin-top:0">Quick Actions</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn primary" id="btnSimAllMotion">Simulate motion (all)</button>
+          <button class="btn" id="btnSimSmoke">Simulate smoke</button>
+          <button class="btn" id="btnClearLog">Clear log</button>
+        </div>
+      </div>
+
+      <div>
+        <h2 style="margin-bottom:8px;margin-top:0">Rule Builder</h2>
+        <div class="form-row">
+          <select id="rb_trigger_device"></select>
+          <select id="rb_trigger_event">
+            <option value="motion_detected">motion_detected</option>
+            <option value="no_motion_5m">no_motion_5m</option>
+            <option value="smoke_detected">smoke_detected</option>
+            <option value="time_event">time_event</option>
+          </select>
+          <select id="rb_condition">
+            <option value="">(no condition)</option>
+            <option value="time.isNight">time.isNight()</option>
+            <option value="time.isMorning">time.isMorning()</option>
+          </select>
+        </div>
+
+        <div style="height:8px"></div>
+
+        <div class="form-row">
+          <select id="rb_action_device"></select>
+          <select id="rb_action_type">
+            <option value="set_state">set_state</option>
+            <option value="set_brightness">set_brightness</option>
+            <option value="set_color">set_color</option>
+            <option value="set_volume">set_volume</option>
+          </select>
+          <input type="text" id="rb_action_value" placeholder='e.g. {"state":"on"} or 60' />
+        </div>
+
+        <div style="height:8px"></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn primary" id="rb_add">Add Rule</button>
+          <button class="btn" id="rb_save">Save Rules</button>
+        </div>
+        <div class="small" style="margin-top:8px">Example value for set_state: {"state":"on"}</div>
+      </div>
+
+      <div>
+        <h2 style="margin-bottom:8px;margin-top:0">Active Rules</h2>
+        <div id="rulesList" class="rules-list"></div>
+      </div>
+
+      <div>
+        <h2 style="margin-bottom:8px;margin-top:0">Activity Log</h2>
+        <div id="log" class="log"></div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="card" id="tipsCard">
+    <h2 style="margin-top:0">Tips</h2>
+    <ul class="small">
+      <li>Use the color & brightness controls on lights for mood scenes.</li>
+      <li>Use rule-builder to create IF → THEN automations (they persist in localStorage).</li>
+      <li>Modes (Morning / Night / Away) run prebuilt routines.</li>
+      <li>App is responsive — test on mobile and tablet for touch interactions.</li>
+    </ul>
+  </section>
+</main>
+
+<footer>Smart Haven • Simulator • Mobile demo-ready</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // ---------- Utilities ----------
+  function saveData(key, obj){ try { localStorage.setItem(key, JSON.stringify(obj)); } catch(e){ console.error(e); } }
+  function loadData(key){ try { const s = localStorage.getItem(key); return s ? JSON.parse(s) : null; } catch(e){ console.error(e); return null; } }
+  function uid(prefix="id"){ return prefix + "_" + Math.random().toString(36).slice(2,9); }
+
+  // ---------- Default home ----------
+  const DEFAULT_HOME = {
+    home: {
+      name: "Smart Haven",
+      rooms: [
+        { name:"Living Room", devices:[
+            { id:"light_livingroom", type:"light", label:"Living Light", state:"off", brightness:0, color:"#ffd6a5" },
+            { id:"music_livingroom", type:"music_player", label:"Living Music", state:"paused", volume:40 },
+            { id:"motion_livingroom", type:"motion_sensor", label:"Living Motion", state:"idle" },
+            { id:"temperature_livingroom", type:"temperature_sensor", label:"Living Temp", value:22 }
+        ]},
+        { name:"Kitchen", devices:[
+            { id:"coffee_maker", type:"appliance", label:"Coffee Maker", state:"off" },
+            { id:"smoke_sensor", type:"smoke_detector", label:"Smoke Sensor", state:"clear" },
+            { id:"smart_plug_kitchen", type:"smart_plug", label:"Kitchen Plug", state:"off" },
+            { id:"fridge_monitor", type:"door_sensor", label:"Fridge Door", state:"closed" }
+        ]},
+        { name:"Bedroom", devices:[
+            { id:"lamp_bedroom", type:"light", label:"Bed Lamp", state:"off", brightness:0, color:"#fff1f2" },
+            { id:"blinds_bedroom", type:"blinds", label:"Blinds", state:"closed" },
+            { id:"thermostat_bedroom", type:"thermostat", label:"Thermostat", value:19 },
+            { id:"music_bedroom", type:"music_player", label:"Bedroom Music", state:"paused", volume:30 }
+        ]}
+      ]
+    },
+    automations: [
+      { id:"auto_1", name:"Living Motion Lights", trigger:{device:"motion_livingroom", event:"motion_detected"}, cond:"", actions:[{device:"light_livingroom", set:{state:"on", brightness:80}}, {device:"music_livingroom", set:{state:"playing"}}] },
+      { id:"auto_4", name:"Smoke Alert", trigger:{device:"smoke_sensor", event:"smoke_detected"}, cond:"", actions:[{device:"music_livingroom", set:{state:"paused"}},{device:"light_livingroom", set:{state:"on", brightness:100}},{alert:"🚨 Smoke detected! Evacuate immediately!" }] }
+    ]
+  };
+
+  // ---------- State ----------
+  let smartHome = loadData("smart_home_v2") || DEFAULT_HOME;
+  let userRules = loadData("smart_rules_v2") || smartHome.automations.slice();
+
+  // ---------- Element refs ----------
+  const roomsContainer = document.getElementById("roomsContainer");
+  const logDiv = document.getElementById("log");
+  const rbTriggerDevice = document.getElementById("rb_trigger_device");
+  const rbTriggerEvent = document.getElementById("rb_trigger_event");
+  const rbCondition = document.getElementById("rb_condition");
+  const rbActionDevice = document.getElementById("rb_action_device");
+  const rbActionType = document.getElementById("rb_action_type");
+  const rbActionValue = document.getElementById("rb_action_value");
+  const rulesList = document.getElementById("rulesList");
+  const btnSimAllMotion = document.getElementById("btnSimAllMotion");
+  const btnSimSmoke = document.getElementById("btnSimSmoke");
+  const btnClearLog = document.getElementById("btnClearLog");
+
+  // ---------- Helpers ----------
+  function findDeviceById(id){
+    for(const r of smartHome.home.rooms){
+      const dev = r.devices.find(d=>d.id===id);
+      if(dev) return dev;
+    }
+    return null;
+  }
+  function findRoomByDeviceId(id){
+    for(const r of smartHome.home.rooms) if(r.devices.some(d=>d.id===id)) return r;
+    return null;
+  }
+
+  // ---------- Logging ----------
+  function log(msg, level="info"){
+    const time = new Date().toLocaleTimeString();
+    const div = document.createElement("div"); div.className = "log-entry";
+    if(level==="warn") div.style.color = "var(--danger)";
+    if(level==="ok") div.style.color = "var(--ok)";
+    div.innerHTML = `[${time}] ${msg}`;
+    logDiv.prepend(div);
+  }
+  function clearLogs(){ logDiv.innerHTML=""; log("Logs cleared","info"); }
+
+  // ---------- Render rooms ----------
+  function deviceIcon(type){
+    switch(type){
+      case "light": return "💡";
+      case "music_player": return "🎵";
+      case "motion_sensor": return "👣";
+      case "smoke_detector": return "🔥";
+      case "appliance": return "☕";
+      case "smart_plug": return "🔌";
+      case "door_sensor": return "🚪";
+      case "thermostat": return "🌡️";
+      case "blinds": return "🪟";
+      default: return "•";
+    }
+  }
+  function formatDeviceState(d){
+    if(d.type==="light") return `${d.state} • ${d.brightness ?? 0}% • ${d.color ?? ""}`;
+    if(d.type==="music_player") return `${d.state} • vol ${d.volume ?? 0}%`;
+    if(d.type==="temperature_sensor"|| d.type==="thermostat") return `${d.value}°C`;
+    return d.state || "";
+  }
+
+  function renderRooms(){
+    try {
+      roomsContainer.innerHTML = "";
+      const header = document.createElement("div");
+      header.style.display="flex"; header.style.justifyContent="space-between"; header.style.alignItems="center"; header.style.marginBottom="8px";
+      header.innerHTML = `<h2 style="margin:0">Rooms</h2><div class="pill">Mode: ${currentMode || "Home"}</div>`;
+      roomsContainer.appendChild(header);
+
+      for(const room of smartHome.home.rooms){
+        const roomDiv = document.createElement("div");
+        roomDiv.className = "room-card card";
+        let html = `<h2>${room.name}</h2><div class="devices">`;
+        for(const d of room.devices){
+          html += `<div class="device-row" id="row_${d.id}">
+            <div class="device-left">
+              <div class="icon">${deviceIcon(d.type)}</div>
+              <div class="device-name">
+                <div style="font-weight:700">${d.label || d.id}</div>
+                <small>${formatDeviceState(d)}</small>
+              </div>
+            </div>
+            <div class="device-controls" id="controls_${d.id}"></div>
+          </div>`;
+        }
+        html += `</div>`;
+        roomDiv.innerHTML = html;
+        roomsContainer.appendChild(roomDiv);
+      }
+
+      // attach controls after DOM nodes exist
+      for(const room of smartHome.home.rooms){
+        for(const d of room.devices){
+          const controls = document.getElementById(`controls_${d.id}`);
+          if(!controls) continue;
+          controls.innerHTML = "";
+          // LIGHT
+          if(d.type==="light"){
+            const color = document.createElement("input"); color.type="color"; color.className="color-input"; color.value = d.color || "#ffd6a5";
+            color.oninput = ()=>{ d.color = color.value; saveData("smart_home_v2", smartHome); renderRooms(); log(`💡 ${d.label} color ${d.color}`); };
+            const bright = document.createElement("input"); bright.type="range"; bright.min=0; bright.max=100; bright.value = d.brightness || 0;
+            bright.oninput = ()=>{ d.brightness = Number(bright.value); d.state = d.brightness>0 ? "on" : "off"; saveData("smart_home_v2", smartHome); renderRooms(); log(`💡 ${d.label} brightness ${d.brightness}%`); };
+            const toggle = document.createElement("button"); toggle.className="btn"; toggle.textContent = d.state==="on" ? "On" : "Off";
+            toggle.onclick = ()=>{ d.state = d.state==="on" ? "off" : "on"; if(d.state==="on" && d.brightness===0) d.brightness=80; saveData("smart_home_v2", smartHome); renderRooms(); log(`🕹️ ${d.label} toggled ${d.state}`); };
+            controls.appendChild(color); controls.appendChild(bright); controls.appendChild(toggle);
+          }
+          // MUSIC
+          else if(d.type==="music_player"){
+            const vol = document.createElement("input"); vol.type="range"; vol.min=0; vol.max=100; vol.value = d.volume || 40;
+            vol.oninput = ()=>{ d.volume = Number(vol.value); saveData("smart_home_v2", smartHome); renderRooms(); log(`🔊 ${d.label} volume ${d.volume}`); };
+            const play = document.createElement("button"); play.className="btn"; play.textContent = d.state==="playing" ? "Pause" : "Play";
+            play.onclick = ()=>{ d.state = d.state==="playing" ? "paused" : "playing"; saveData("smart_home_v2", smartHome); renderRooms(); log(`▶️ ${d.label} ${d.state}`); };
+            controls.appendChild(vol); controls.appendChild(play);
+          }
+          // MOTION
+          else if(d.type==="motion_sensor"){
+            const btn = document.createElement("button"); btn.className="btn"; btn.textContent="Simulate motion";
+            btn.onclick = ()=>{ d.state="active"; saveData("smart_home_v2", smartHome); renderRooms(); simulateEvent(d.id,"motion_detected"); setTimeout(()=>{ d.state="idle"; saveData("smart_home_v2", smartHome); renderRooms(); simulateEvent(d.id,"no_motion_5m"); },5000); log(`👣 Simulated motion at ${d.label}`); };
+            controls.appendChild(btn);
+          }
+          // SMOKE
+          else if(d.type==="smoke_detector"){
+            const btn = document.createElement("button"); btn.className="btn"; btn.textContent="Simulate smoke";
+            btn.onclick = ()=>{ d.state="smoke"; saveData("smart_home_v2", smartHome); renderRooms(); simulateEvent(d.id,"smoke_detected"); setTimeout(()=>{ d.state="clear"; saveData("smart_home_v2", smartHome); renderRooms(); },8000); log(`🔥 Simulated smoke at ${d.label}`); };
+            controls.appendChild(btn);
+          }
+          // APPLIANCE/PLUG/BLINDS
+          else if(["appliance","smart_plug","blinds"].includes(d.type)){
+            const btn = document.createElement("button"); btn.className="btn"; btn.textContent = (d.state==="on"||d.state==="open") ? "On" : "Off";
+            btn.onclick = ()=>{ d.state = (d.state==="on"||d.state==="open") ? (d.type==="blinds" ? "closed" : "off") : (d.type==="blinds" ? "open" : "on"); saveData("smart_home_v2", smartHome); renderRooms(); log(`🕹️ ${d.label} ${d.state}`); };
+            controls.appendChild(btn);
+          }
+          // THERMOSTAT/TEMP
+          else if(["thermostat","temperature_sensor"].includes(d.type)){
+            const btn = document.createElement("button"); btn.className="btn"; btn.textContent = `${d.value}°C`;
+            btn.onclick = ()=>{ d.value = (d.value === 19 ? 22 : 19); saveData("smart_home_v2", smartHome); renderRooms(); log(`🌡️ ${d.label} set ${d.value}°C`); };
+            controls.appendChild(btn);
+          }
+          else {
+            const btn = document.createElement("button"); btn.className="btn"; btn.textContent = "Action";
+            btn.onclick = ()=>{ log(`Action for ${d.label || d.id}`); };
+            controls.appendChild(btn);
+          }
+        }
+      }
+
+      // after rendering devices, refresh rule-builder selects
+      populateRuleBuilder();
+    } catch(e){ console.error("renderRooms error:", e); log("⚠️ Error rendering rooms: " + e.message, "warn"); }
+  }
+
+  // ---------- Rule builder population ----------
+  function populateRuleBuilder(){
+    try {
+      rbTriggerDevice.innerHTML = ""; rbActionDevice.innerHTML = "";
+      const devs = [];
+      for(const r of smartHome.home.rooms) for(const d of r.devices) devs.push({id:d.id,label:d.label||d.id, type:d.type});
+      devs.forEach(d=>{
+        const o1 = document.createElement("option"); o1.value=d.id; o1.textContent=d.label; rbTriggerDevice.appendChild(o1);
+        const o2 = document.createElement("option"); o2.value=d.id; o2.textContent=d.label; rbActionDevice.appendChild(o2);
+      });
+    } catch(e){ console.error("populateRuleBuilder error:", e); }
+  }
+
+  // ---------- Automation engine ----------
+  function applyActionObj(action){
+    if(action.device){
+      const device = findDeviceById(action.device);
+      if(!device){ log("⚠️ Action target not found: " + action.device, "warn"); return; }
+      if(action.set){ Object.assign(device, action.set); saveData("smart_home_v2", smartHome); renderRooms(); log(`🔧 ${device.label||device.id} updated → ${JSON.stringify(action.set)}`, "ok"); }
+    } else if(action.alert){
+      log(action.alert, "warn");
+    }
+  }
+
+  function simulateEvent(deviceId, eventType){
+    log(`🎯 Event: ${deviceId} → ${eventType}`);
+    for(const rule of userRules){
+      const trig = rule.trigger || {};
+      const cond = rule.cond || "";
+      let trigMatches = false;
+      if(trig.device === deviceId && trig.event === eventType) trigMatches = true;
+      if(trig.event === "time_event" && eventType === "time_event" && trig.time && rule.time) trigMatches = (trig.time === rule.time);
+
+      if(trigMatches){
+        let condOk = true;
+        if(cond === "time.isNight") condOk = isNight();
+        if(cond === "time.isMorning") condOk = isMorning();
+        if(condOk){
+          log(`⚙️ Rule triggered: ${rule.name}`);
+          for(const a of rule.actions) applyActionObj(a);
+        } else {
+          log(`(rule ${rule.name} skipped due to condition)`);
+        }
+      }
+    }
+  }
+
+  // ---------- Rule builder handlers ----------
+  document.getElementById("rb_add").addEventListener("click", ()=>{
+    try {
+      const triggerDevice = rbTriggerDevice.value;
+      const triggerEvent = rbTriggerEvent.value;
+      const condition = rbCondition.value || "";
+      const actionDevice = rbActionDevice.value;
+      const actionType = rbActionType.value;
+      const actionValueRaw = rbActionValue.value.trim();
+      if(!triggerDevice || !triggerEvent || !actionDevice || !actionType || !actionValueRaw){ alert("Fill trigger + action + value"); return; }
+
+      let parsed;
+      try { parsed = JSON.parse(actionValueRaw); } catch(e){ parsed = (!isNaN(Number(actionValueRaw)) ? Number(actionValueRaw) : actionValueRaw); }
+
+      const actionObj = {};
+      if(actionType === "set_state"){ actionObj.device = actionDevice; actionObj.set = parsed; }
+      else if(actionType === "set_brightness"){ actionObj.device = actionDevice; actionObj.set = { brightness: Number(parsed), state: Number(parsed) > 0 ? "on" : "off" }; }
+      else if(actionType === "set_color"){ actionObj.device = actionDevice; actionObj.set = { color: parsed }; }
+      else if(actionType === "set_volume"){ actionObj.device = actionDevice; actionObj.set = { volume: Number(parsed) }; }
+
+      const newRule = { id: uid("rule"), name: `Rule ${userRules.length+1}`, trigger: { device: triggerDevice, event: triggerEvent }, cond: condition, actions: [actionObj] };
+      userRules.push(newRule);
+      saveData("smart_rules_v2", userRules);
+      renderRules();
+      log(`➕ Created rule ${newRule.name}`);
+      rbActionValue.value = "";
+    } catch(e){ console.error("rb_add error:", e); alert("Error creating rule: "+e.message); }
+  });
+
+  document.getElementById("rb_save").addEventListener("click", ()=>{ saveData("smart_rules_v2", userRules); log("💾 Rules saved", "ok"); });
+
+  function renderRules(){
+    rulesList.innerHTML = "";
+    userRules.forEach((r,i)=>{
+      const div = document.createElement("div"); div.style.display="flex"; div.style.justifyContent="space-between"; div.style.alignItems="center"; div.style.padding="8px"; div.style.borderRadius="8px"; div.style.background="rgba(255,255,255,0.01)";
+      const left = document.createElement("div"); left.innerHTML = `<strong>${r.name}</strong><div class="small">IF ${r.trigger.device} → ${r.trigger.event}${r.cond? " WHEN "+r.cond : ""}</div>`;
+      const right = document.createElement("div");
+      const rm = document.createElement("button"); rm.className="btn"; rm.textContent="Remove"; rm.onclick = ()=>{ userRules.splice(i,1); saveData("smart_rules_v2", userRules); renderRules(); log(`🗑️ Removed ${r.name}`); };
+      right.appendChild(rm);
+      div.appendChild(left); div.appendChild(right);
+      rulesList.appendChild(div);
+    });
+  }
+
+  // ---------- Modes ----------
+  let currentMode = "Home";
+  document.getElementById("modeMorning").addEventListener("click", ()=> runMode("Morning"));
+  document.getElementById("modeNight").addEventListener("click", ()=> runMode("Night"));
+  document.getElementById("modeAway").addEventListener("click", ()=> runMode("Away"));
+
+  function setModeButtons(m){
+    currentMode = m; document.querySelectorAll(".mode-btn").forEach(b=>b.classList.remove("active"));
+    if(m==="Morning") document.getElementById("modeMorning").classList.add("active");
+    if(m==="Night") document.getElementById("modeNight").classList.add("active");
+    if(m==="Away") document.getElementById("modeAway").classList.add("active");
+    renderRooms();
+  }
+
+  function runMode(mode){
+    setModeButtons(mode); log(`⚡ Running mode: ${mode}`, "ok");
+    if(mode==="Morning"){
+      applyActionObj({device:"lamp_bedroom", set:{state:"on", brightness:70}});
+      applyActionObj({device:"blinds_bedroom", set:{state:"open"}});
+      applyActionObj({device:"music_bedroom", set:{state:"playing", volume:40}});
+      applyActionObj({device:"coffee_maker", set:{state:"on"}});
+    } else if(mode==="Night"){
+      applyActionObj({device:"light_livingroom", set:{state:"on", brightness:20}});
+      applyActionObj({device:"lamp_bedroom", set:{state:"off", brightness:0}});
+      applyActionObj({device:"music_livingroom", set:{state:"paused"}});
+    } else if(mode==="Away"){
+      smartHome.home.rooms.flatMap(r=>r.devices).forEach(d=>{
+        if(["light","music_player","appliance","smart_plug"].includes(d.type)){ applyActionObj({device:d.id, set:{state:"off"}}); }
+      });
+      log("🔒 Away: non-security devices off", "ok");
+    }
+  }
+
+  // ---------- Quick event buttons ----------
+  btnSimAllMotion.addEventListener("click", ()=> {
+    smartHome.home.rooms.forEach(r=>{
+      const m = r.devices.find(d=>d.type==="motion_sensor");
+      if(m){ m.state="active"; simulateEvent(m.id,"motion_detected"); setTimeout(()=>{ m.state="idle"; simulateEvent(m.id,"no_motion_5m"); saveData("smart_home_v2", smartHome); renderRooms(); },5000); }
+    });
+    saveData("smart_home_v2", smartHome); renderRooms(); log("👣 Simulated motion (all)");
+  });
+
+  btnSimSmoke.addEventListener("click", ()=> {
+    const s = findDeviceById("smoke_sensor");
+    if(s){ s.state="smoke"; simulateEvent(s.id,"smoke_detected"); setTimeout(()=>{ s.state="clear"; saveData("smart_home_v2", smartHome); renderRooms(); },8000); }
+    saveData("smart_home_v2", smartHome); renderRooms(); log("🔥 Simulated smoke");
+  });
+
+  btnClearLog.addEventListener("click", ()=> clearLogs());
+
+  // ---------- Time helpers ----------
+  function isNight(){ const h = new Date().getHours(); return (h >= 19 || h < 6); }
+  function isMorning(){ const h = new Date().getHours(); return (h >= 6 && h < 10); }
+
+  // ---------- Init ----------
+  function init(){
+    try {
+      // save initial state if not present
+      if(!loadData("smart_home_v2")) saveData("smart_home_v2", smartHome);
+      if(!loadData("smart_rules_v2")) saveData("smart_rules_v2", userRules);
+
+      renderRooms();
+      renderRules();
+      setModeButtons("Home");
+      log("🏡 Smart Haven initialized", "ok");
+      // periodic persistence & re-render to keep UI fresh
+      setInterval(()=>{ saveData("smart_home_v2", smartHome); renderRooms(); }, 4000);
+    } catch(e){ console.error("init error:", e); log("⚠️ Initialization error: "+e.message, "warn"); }
+  }
+
+  init();
+});
+</script>
+</body>
+</html>
