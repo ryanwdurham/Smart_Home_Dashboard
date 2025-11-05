@@ -160,6 +160,51 @@
     display: block;
   }
   
+  /* Scenarios Grid */
+  .scenarios-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    margin-bottom: 20px;
+  }
+  
+  .scenario-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: var(--shadow);
+  }
+  
+  .scenario-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent);
+  }
+  
+  .scenario-card:active {
+    transform: scale(0.98);
+  }
+  
+  .scenario-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+  
+  .scenario-name {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  
+  .scenario-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  
   /* Rooms Grid */
   .rooms-grid {
     display: grid;
@@ -244,6 +289,43 @@
     justify-content: center;
     font-size: 20px;
     flex-shrink: 0;
+    position: relative;
+  }
+  
+  /* Animated status indicators */
+  .status-indicator {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--bg-elevated);
+  }
+  
+  .status-indicator.active {
+    background: var(--success);
+    animation: pulse 2s infinite;
+  }
+  
+  .status-indicator.warning {
+    background: var(--warning);
+    animation: pulse 2s infinite;
+  }
+  
+  .status-indicator.danger {
+    background: var(--danger);
+    animation: pulse-fast 1s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.1); }
+  }
+  
+  @keyframes pulse-fast {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
   }
   
   .device-info {
@@ -411,6 +493,40 @@
     color: white;
   }
   
+  /* Stats Cards */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+  
+  .stat-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  
+  .stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  
+  .stat-unit {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin-left: 4px;
+  }
+  
   /* Rule Builder */
   .rule-builder {
     background: var(--bg-card);
@@ -551,6 +667,80 @@
     margin-right: 8px;
   }
   
+  /* Toast Notifications */
+  .toast-container {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+  }
+  
+  .toast {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: start;
+    gap: 12px;
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  @keyframes slideIn {
+    from {
+      transform: translateX(400px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  .toast.success { border-left: 4px solid var(--success); }
+  .toast.warning { border-left: 4px solid var(--warning); }
+  .toast.danger { border-left: 4px solid var(--danger); }
+  .toast.info { border-left: 4px solid var(--accent); }
+  
+  .toast-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  
+  .toast-content {
+    flex: 1;
+  }
+  
+  .toast-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  
+  .toast-message {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  
+  .toast-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 20px;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  
   /* Empty State */
   .empty-state {
     text-align: center;
@@ -573,6 +763,14 @@
   }
   
   /* Responsive */
+  @media (max-width: 768px) {
+    .toast-container {
+      right: 10px;
+      left: 10px;
+      max-width: none;
+    }
+  }
+  
   @media (max-width: 480px) {
     .container {
       padding: 16px;
@@ -594,10 +792,16 @@
     .actions-grid {
       grid-template-columns: 1fr;
     }
+    
+    .scenarios-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 </style>
 </head>
 <body>
+
+<div class="toast-container" id="toastContainer"></div>
 
 <header>
   <div class="header-content">
@@ -620,8 +824,10 @@
   <!-- Tabs -->
   <div class="tabs">
     <div class="tab active" data-tab="rooms">🏠 Rooms</div>
+    <div class="tab" data-tab="scenarios">⚡ Scenarios</div>
+    <div class="tab" data-tab="stats">📊 Stats</div>
     <div class="tab" data-tab="automations">⚙️ Automations</div>
-    <div class="tab" data-tab="activity">📊 Activity</div>
+    <div class="tab" data-tab="activity">📝 Activity</div>
   </div>
   
   <!-- Rooms Tab -->
@@ -631,11 +837,118 @@
       <div class="actions-grid">
         <button class="action-btn primary" id="btnSimAllMotion">Simulate All Motion</button>
         <button class="action-btn" id="btnSimSmoke">Test Smoke Alarm</button>
+        <button class="action-btn" id="btnTestLeak">Test Leak Sensor</button>
         <button class="action-btn" id="btnClearLog">Clear Activity Log</button>
       </div>
     </div>
     
     <div class="rooms-grid" id="roomsContainer"></div>
+  </div>
+  
+  <!-- Scenarios Tab -->
+  <div class="tab-content" data-content="scenarios">
+    <div class="quick-actions">
+      <div class="section-title">🎬 Quick Scenarios</div>
+      <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+        One-tap actions to control multiple devices at once
+      </p>
+    </div>
+    
+    <div class="scenarios-grid">
+      <div class="scenario-card" data-scenario="movie">
+        <div class="scenario-icon">🎬</div>
+        <div class="scenario-name">Movie Time</div>
+        <div class="scenario-desc">Dim lights, close blinds</div>
+      </div>
+      
+      <div class="scenario-card" data-scenario="dinner">
+        <div class="scenario-icon">🍽️</div>
+        <div class="scenario-name">Dinner Mode</div>
+        <div class="scenario-desc">Cozy lighting & music</div>
+      </div>
+      
+      <div class="scenario-card" data-scenario="wfh">
+        <div class="scenario-icon">💼</div>
+        <div class="scenario-name">Work From Home</div>
+        <div class="scenario-desc">Office setup</div>
+      </div>
+      
+      <div class="scenario-card" data-scenario="sleep">
+        <div class="scenario-icon">😴</div>
+        <div class="scenario-name">Bedtime</div>
+        <div class="scenario-desc">All lights off, lock up</div>
+      </div>
+      
+      <div class="scenario-card" data-scenario="arrive">
+        <div class="scenario-icon">🏡</div>
+        <div class="scenario-name">Arriving Home</div>
+        <div class="scenario-desc">Unlock, lights on</div>
+      </div>
+      
+      <div class="scenario-card" data-scenario="party">
+        <div class="scenario-icon">🎉</div>
+        <div class="scenario-name">Party Mode</div>
+        <div class="scenario-desc">Bright lights, music up</div>
+      </div>
+      
+      <div class="scenario-card" data-scenario="vacation">
+        <div class="scenario-icon">✈️</div>
+        <div class="scenario-name">Vacation Mode</div>
+        <div class="scenario-desc">Random lights, secure</div>
+      </div>
+      
+      <div class="scenario-card" data-scenario="alloff">
+        <div class="scenario-icon">🔴</div>
+        <div class="scenario-name">All Off</div>
+        <div class="scenario-desc">Turn everything off</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Stats Tab -->
+  <div class="tab-content" data-content="stats">
+    <div class="stats-grid" id="statsContainer">
+      <div class="stat-card">
+        <div class="stat-label">Active Devices</div>
+        <div class="stat-value">
+          <span id="statActiveDevices">0</span>
+          <span class="stat-unit">/ <span id="statTotalDevices">0</span></span>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-label">Energy Usage (Est.)</div>
+        <div class="stat-value">
+          <span id="statEnergy">0</span>
+          <span class="stat-unit">kWh/day</span>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-label">Automations Triggered</div>
+        <div class="stat-value">
+          <span id="statAutomations">0</span>
+          <span class="stat-unit">today</span>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-label">Average Temperature</div>
+        <div class="stat-value">
+          <span id="statTemp">0</span>
+          <span class="stat-unit">°C</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="activity-log">
+      <div class="section-title">📈 Device Activity</div>
+      <div class="log-container" id="deviceActivity">
+        <div style="color: var(--text-muted); text-align: center; padding: 20px;">
+          Activity tracking shows which devices are used most frequently
+        </div>
+      </div>
+    </div>
   </div>
   
   <!-- Automations Tab -->
@@ -651,6 +964,9 @@
             <option value="motion_detected">Motion Detected</option>
             <option value="no_motion_5m">No Motion (5m)</option>
             <option value="smoke_detected">Smoke Detected</option>
+            <option value="leak_detected">Leak Detected</option>
+            <option value="door_opened">Door Opened</option>
+            <option value="door_closed">Door Closed</option>
             <option value="time_event">Time Event</option>
           </select>
         </div>
@@ -712,7 +1028,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function loadData(key){ try { const s = localStorage.getItem(key); return s ? JSON.parse(s) : null; } catch(e){ console.error(e); return null; } }
   function uid(prefix="id"){ return prefix + "_" + Math.random().toString(36).slice(2,9); }
 
-  // ---------- Default home ----------
+  // ---------- Stats tracking ----------
+  let stats = loadData("smart_stats") || { automationsTriggered: 0 };
+
+  // ---------- Default home with MORE ROOMS ----------
   const DEFAULT_HOME = {
     home: {
       name: "Smart Haven",
@@ -721,35 +1040,77 @@ document.addEventListener("DOMContentLoaded", () => {
             { id:"light_livingroom", type:"light", label:"Living Light", state:"off", brightness:0, color:"#ffd6a5" },
             { id:"music_livingroom", type:"music_player", label:"Living Music", state:"paused", volume:40 },
             { id:"motion_livingroom", type:"motion_sensor", label:"Living Motion", state:"idle" },
-            { id:"temperature_livingroom", type:"temperature_sensor", label:"Living Temp", value:22 }
+            { id:"temperature_livingroom", type:"temperature_sensor", label:"Living Temp", value:22 },
+            { id:"tv_livingroom", type:"tv", label:"Smart TV", state:"off", input:"HDMI1" }
         ]},
         { name:"Kitchen", devices:[
             { id:"coffee_maker", type:"appliance", label:"Coffee Maker", state:"off" },
             { id:"smoke_sensor", type:"smoke_detector", label:"Smoke Sensor", state:"clear" },
             { id:"smart_plug_kitchen", type:"smart_plug", label:"Kitchen Plug", state:"off" },
-            { id:"fridge_monitor", type:"door_sensor", label:"Fridge Door", state:"closed" }
+            { id:"fridge_monitor", type:"door_sensor", label:"Fridge Door", state:"closed" },
+            { id:"leak_kitchen", type:"leak_detector", label:"Leak Sensor", state:"ok" }
         ]},
-        { name:"Bedroom", devices:[
-            { id:"lamp_bedroom", type:"light", label:"Bed Lamp", state:"off", brightness:0, color:"#fff1f2" },
-            { id:"blinds_bedroom", type:"blinds", label:"Blinds", state:"closed" },
-            { id:"thermostat_bedroom", type:"thermostat", label:"Thermostat", value:19 },
-            { id:"music_bedroom", type:"music_player", label:"Bedroom Music", state:"paused", volume:30 }
+        { name:"Master Bedroom", devices:[
+            { id:"lamp_master", type:"light", label:"Bed Lamp", state:"off", brightness:0, color:"#fff1f2" },
+            { id:"blinds_master", type:"blinds", label:"Blinds", state:"closed" },
+            { id:"thermostat_master", type:"thermostat", label:"Thermostat", value:19 },
+            { id:"music_master", type:"music_player", label:"Bedroom Music", state:"paused", volume:30 },
+            { id:"tv_master", type:"tv", label:"Bedroom TV", state:"off", input:"HDMI1" }
+        ]},
+        { name:"Kid's Bedroom", devices:[
+            { id:"nightlight_kids", type:"light", label:"Night Light", state:"off", brightness:20, color:"#a78bfa" },
+            { id:"temp_kids", type:"temperature_sensor", label:"Room Temp", value:21 },
+            { id:"motion_kids", type:"motion_sensor", label:"Motion Sensor", state:"idle" }
+        ]},
+        { name:"Bathroom", devices:[
+            { id:"light_bathroom", type:"light", label:"Vanity Light", state:"off", brightness:0, color:"#ffffff" },
+            { id:"fan_bathroom", type:"fan", label:"Exhaust Fan", state:"off", speed:0 },
+            { id:"leak_bathroom", type:"leak_detector", label:"Leak Sensor", state:"ok" },
+            { id:"motion_bathroom", type:"motion_sensor", label:"Motion Sensor", state:"idle" }
+        ]},
+        { name:"Home Office", devices:[
+            { id:"light_office", type:"light", label:"Desk Lamp", state:"off", brightness:0, color:"#fef3c7" },
+            { id:"music_office", type:"music_player", label:"Office Music", state:"paused", volume:25 },
+            { id:"airquality_office", type:"air_quality", label:"Air Quality", value:"good" },
+            { id:"plug_office", type:"smart_plug", label:"Desk Setup", state:"off" }
+        ]},
+        { name:"Garage", devices:[
+            { id:"door_garage", type:"garage_door", label:"Garage Door", state:"closed" },
+            { id:"light_garage", type:"light", label:"Garage Light", state:"off", brightness:0, color:"#ffffff" },
+            { id:"motion_garage", type:"motion_sensor", label:"Motion Sensor", state:"idle" },
+            { id:"temp_garage", type:"temperature_sensor", label:"Garage Temp", value:15 }
+        ]},
+        { name:"Entry", devices:[
+            { id:"lock_front", type:"smart_lock", label:"Front Door Lock", state:"locked" },
+            { id:"camera_doorbell", type:"camera", label:"Doorbell Camera", state:"idle" },
+            { id:"light_entry", type:"light", label:"Entry Light", state:"off", brightness:0, color:"#fef3c7" },
+            { id:"motion_entry", type:"motion_sensor", label:"Entry Motion", state:"idle" }
+        ]},
+        { name:"Backyard", devices:[
+            { id:"light_backyard", type:"light", label:"Patio Lights", state:"off", brightness:0, color:"#fef3c7" },
+            { id:"sprinkler", type:"sprinkler", label:"Sprinkler System", state:"off" },
+            { id:"camera_backyard", type:"camera", label:"Security Camera", state:"idle" },
+            { id:"temp_outdoor", type:"temperature_sensor", label:"Outdoor Temp", value:18 }
         ]}
       ]
     },
     automations: [
       { id:"auto_1", name:"Living Motion Lights", trigger:{device:"motion_livingroom", event:"motion_detected"}, cond:"", actions:[{device:"light_livingroom", set:{state:"on", brightness:80}}, {device:"music_livingroom", set:{state:"playing"}}] },
-      { id:"auto_4", name:"Smoke Alert", trigger:{device:"smoke_sensor", event:"smoke_detected"}, cond:"", actions:[{device:"music_livingroom", set:{state:"paused"}},{device:"light_livingroom", set:{state:"on", brightness:100}},{alert:"🚨 Smoke detected! Evacuate immediately!" }] }
+      { id:"auto_2", name:"Entry Door Unlock Lights", trigger:{device:"lock_front", event:"door_opened"}, cond:"", actions:[{device:"light_entry", set:{state:"on", brightness:100}}] },
+      { id:"auto_3", name:"Bathroom Motion Night", trigger:{device:"motion_bathroom", event:"motion_detected"}, cond:"time.isNight", actions:[{device:"light_bathroom", set:{state:"on", brightness:30}}] },
+      { id:"auto_4", name:"Smoke Alert", trigger:{device:"smoke_sensor", event:"smoke_detected"}, cond:"", actions:[{device:"music_livingroom", set:{state:"paused"}},{device:"light_livingroom", set:{state:"on", brightness:100}},{alert:"🚨 Smoke detected! Evacuate immediately!" }] },
+      { id:"auto_5", name:"Leak Alert Kitchen", trigger:{device:"leak_kitchen", event:"leak_detected"}, cond:"", actions:[{alert:"💧 Water leak detected in Kitchen!" }] }
     ]
   };
 
   // ---------- State ----------
-  let smartHome = loadData("smart_home_v2") || DEFAULT_HOME;
-  let userRules = loadData("smart_rules_v2") || smartHome.automations.slice();
+  let smartHome = loadData("smart_home_v3") || DEFAULT_HOME;
+  let userRules = loadData("smart_rules_v3") || smartHome.automations.slice();
 
   // ---------- Element refs ----------
   const roomsContainer = document.getElementById("roomsContainer");
   const logDiv = document.getElementById("log");
+  const toastContainer = document.getElementById("toastContainer");
   const rbTriggerDevice = document.getElementById("rb_trigger_device");
   const rbTriggerEvent = document.getElementById("rb_trigger_event");
   const rbCondition = document.getElementById("rb_condition");
@@ -777,8 +1138,42 @@ document.addEventListener("DOMContentLoaded", () => {
       
       tab.classList.add('active');
       document.querySelector(`[data-content="${targetTab}"]`).classList.add('active');
+      
+      if(targetTab === 'stats') updateStats();
     });
   });
+
+  // ---------- Toast Notifications ----------
+  function showToast(title, message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    const icons = {
+      success: '✅',
+      warning: '⚠️',
+      danger: '🚨',
+      info: 'ℹ️'
+    };
+    
+    toast.innerHTML = `
+      <div class="toast-icon">${icons[type] || icons.info}</div>
+      <div class="toast-content">
+        <div class="toast-title">${title}</div>
+        <div class="toast-message">${message}</div>
+      </div>
+      <button class="toast-close">×</button>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    toast.querySelector('.toast-close').addEventListener('click', () => {
+      toast.remove();
+    });
+    
+    setTimeout(() => {
+      toast.remove();
+    }, 5000);
+  }
 
   // ---------- Logging ----------
   function log(msg, level="info"){
@@ -792,6 +1187,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function clearLogs(){ 
     logDiv.innerHTML=""; 
     log("Activity log cleared","info"); 
+    showToast("Log Cleared", "Activity history has been cleared", "info");
   }
 
   // ---------- Device Icons ----------
@@ -807,8 +1203,31 @@ document.addEventListener("DOMContentLoaded", () => {
       case "thermostat": return "🌡️";
       case "temperature_sensor": return "🌡️";
       case "blinds": return "🪟";
+      case "leak_detector": return "💧";
+      case "smart_lock": return "🔐";
+      case "camera": return "📹";
+      case "garage_door": return "🚗";
+      case "fan": return "💨";
+      case "air_quality": return "🌬️";
+      case "sprinkler": return "💦";
+      case "tv": return "📺";
       default: return "🔘";
     }
+  }
+
+  // ---------- Device Status Indicator ----------
+  function getStatusIndicator(device) {
+    if(device.type === "light" && device.state === "on") return "active";
+    if(device.type === "music_player" && device.state === "playing") return "active";
+    if(device.type === "motion_sensor" && device.state === "active") return "warning";
+    if(device.type === "smoke_detector" && device.state === "smoke") return "danger";
+    if(device.type === "leak_detector" && device.state === "leak") return "danger";
+    if(device.type === "smart_lock" && device.state === "unlocked") return "warning";
+    if(device.type === "camera" && device.state === "motion") return "warning";
+    if(device.type === "tv" && device.state === "on") return "active";
+    if(device.type === "fan" && device.state === "on") return "active";
+    if(device.state === "on" || device.state === "open") return "active";
+    return "";
   }
 
   // ---------- Render Rooms ----------
@@ -846,6 +1265,27 @@ document.addEventListener("DOMContentLoaded", () => {
           } else if(device.type === "smoke_detector"){
             statusText = device.state === "smoke" ? "🚨 SMOKE DETECTED!" : "Clear";
             statusClass = device.state === "smoke" ? "danger" : "active";
+          } else if(device.type === "leak_detector"){
+            statusText = device.state === "leak" ? "🚨 LEAK DETECTED!" : "No Leaks";
+            statusClass = device.state === "leak" ? "danger" : "active";
+          } else if(device.type === "smart_lock"){
+            statusText = device.state === "locked" ? "🔒 Locked" : "🔓 Unlocked";
+            statusClass = device.state === "locked" ? "active" : "warning";
+          } else if(device.type === "camera"){
+            statusText = device.state === "motion" ? "Motion Detected" : "Monitoring";
+            statusClass = device.state === "motion" ? "warning" : "active";
+          } else if(device.type === "garage_door"){
+            statusText = device.state === "closed" ? "Closed" : "Open";
+            statusClass = device.state === "closed" ? "active" : "warning";
+          } else if(device.type === "fan"){
+            statusText = device.state === "on" ? `Speed ${device.speed || 0}` : "Off";
+            statusClass = device.state === "on" ? "active" : "";
+          } else if(device.type === "air_quality"){
+            statusText = `Air Quality: ${device.value || "Unknown"}`;
+            statusClass = device.value === "good" ? "active" : device.value === "moderate" ? "warning" : "danger";
+          } else if(device.type === "tv"){
+            statusText = device.state === "on" ? `On • ${device.input || "HDMI1"}` : "Off";
+            statusClass = device.state === "on" ? "active" : "";
           } else if(device.type === "temperature_sensor" || device.type === "thermostat"){
             statusText = `${device.value}°C`;
           } else {
@@ -853,9 +1293,14 @@ document.addEventListener("DOMContentLoaded", () => {
             statusClass = (device.state === "on" || device.state === "open") ? "active" : "";
           }
           
+          const indicator = getStatusIndicator(device);
+          
           deviceDiv.innerHTML = `
             <div class="device-header">
-              <div class="device-icon">${deviceIcon(device.type)}</div>
+              <div class="device-icon">
+                ${deviceIcon(device.type)}
+                ${indicator ? `<div class="status-indicator ${indicator}"></div>` : ''}
+              </div>
               <div class="device-info">
                 <div class="device-name">${device.label || device.id}</div>
                 <div class="device-status ${statusClass}">${statusText}</div>
@@ -871,172 +1316,298 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       
       // Attach controls
-      for(const room of smartHome.home.rooms){
-        for(const d of room.devices){
-          const controls = document.getElementById(`controls_${d.id}`);
-          if(!controls) continue;
-          controls.innerHTML = "";
-          
-          // LIGHT
-          if(d.type==="light"){
-            const colorWrap = document.createElement("div");
-            const color = document.createElement("input");
-            color.type="color";
-            color.value = d.color || "#ffd6a5";
-            color.oninput = ()=>{ 
-              d.color = color.value; 
-              saveData("smart_home_v2", smartHome); 
-              renderRooms(); 
-              log(`💡 ${d.label} color changed`); 
-            };
-            colorWrap.appendChild(color);
-            
-            const sliderWrap = document.createElement("div");
-            sliderWrap.className = "control-slider";
-            const bright = document.createElement("input");
-            bright.type="range";
-            bright.min=0;
-            bright.max=100;
-            bright.value = d.brightness || 0;
-            bright.oninput = ()=>{ 
-              d.brightness = Number(bright.value); 
-              d.state = d.brightness>0 ? "on" : "off"; 
-              saveData("smart_home_v2", smartHome); 
-              renderRooms(); 
-              log(`💡 ${d.label} brightness ${d.brightness}%`); 
-            };
-            sliderWrap.appendChild(bright);
-            
-            const toggle = document.createElement("button");
-            toggle.className = d.state==="on" ? "control-btn success" : "control-btn";
-            toggle.textContent = d.state==="on" ? "On" : "Off";
-            toggle.onclick = ()=>{ 
-              d.state = d.state==="on" ? "off" : "on"; 
-              if(d.state==="on" && d.brightness===0) d.brightness=80; 
-              saveData("smart_home_v2", smartHome); 
-              renderRooms(); 
-              log(`💡 ${d.label} toggled ${d.state}`); 
-            };
-            
-            controls.appendChild(colorWrap);
-            controls.appendChild(sliderWrap);
-            controls.appendChild(toggle);
-          }
-          // MUSIC
-          else if(d.type==="music_player"){
-            const sliderWrap = document.createElement("div");
-            sliderWrap.className = "control-slider";
-            const vol = document.createElement("input");
-            vol.type="range";
-            vol.min=0;
-            vol.max=100;
-            vol.value = d.volume || 40;
-            vol.oninput = ()=>{ 
-              d.volume = Number(vol.value); 
-              saveData("smart_home_v2", smartHome); 
-              renderRooms(); 
-              log(`🔊 ${d.label} volume ${d.volume}%`); 
-            };
-            sliderWrap.appendChild(vol);
-            
-            const play = document.createElement("button");
-            play.className = d.state==="playing" ? "control-btn success" : "control-btn";
-            play.textContent = d.state==="playing" ? "⏸ Pause" : "▶️ Play";
-            play.onclick = ()=>{ 
-              d.state = d.state==="playing" ? "paused" : "playing"; 
-              saveData("smart_home_v2", smartHome); 
-              renderRooms(); 
-              log(`🎵 ${d.label} ${d.state}`); 
-            };
-            
-            controls.appendChild(sliderWrap);
-            controls.appendChild(play);
-          }
-          // MOTION
-          else if(d.type==="motion_sensor"){
-            const btn = document.createElement("button");
-            btn.className="control-btn primary";
-            btn.textContent="Test Motion";
-            btn.onclick = ()=>{ 
-              d.state="active"; 
-              saveData("smart_home_v2", smartHome); 
-              renderRooms(); 
-              simulateEvent(d.id,"motion_detected"); 
-              setTimeout(()=>{ 
-                d.state="idle"; 
-                saveData("smart_home_v2", smartHome); 
-                renderRooms(); 
-                simulateEvent(d.id,"no_motion_5m"); 
-              },5000); 
-              log(`👣 Motion simulated at ${d.label}`, "warning"); 
-            };
-            controls.appendChild(btn);
-          }
-          // SMOKE
-          else if(d.type==="smoke_detector"){
-            const btn = document.createElement("button");
-            btn.className="control-btn danger";
-            btn.textContent="🚨 Test Alarm";
-            btn.onclick = ()=>{ 
-              d.state="smoke"; 
-              saveData("smart_home_v2", smartHome); 
-              renderRooms(); 
-              simulateEvent(d.id,"smoke_detected"); 
-              setTimeout(()=>{ 
-                d.state="clear"; 
-                saveData("smart_home_v2", smartHome); 
-                renderRooms(); 
-              },8000); 
-              log(`🔥 Smoke alarm triggered at ${d.label}`, "danger"); 
-            };
-            controls.appendChild(btn);
-          }
-          // APPLIANCE/PLUG/BLINDS
-          else if(["appliance","smart_plug","blinds"].includes(d.type)){
-            const btn = document.createElement("button");
-            const isOn = (d.state==="on"||d.state==="open");
-            btn.className = isOn ? "control-btn success" : "control-btn";
-            btn.textContent = isOn ? "Turn Off" : "Turn On";
-            btn.onclick = ()=>{ 
-              d.state = isOn ? (d.type==="blinds" ? "closed" : "off") : (d.type==="blinds" ? "open" : "on"); 
-              saveData("smart_home_v2", smartHome); 
-              renderRooms(); 
-              log(`${deviceIcon(d.type)} ${d.label} ${d.state}`); 
-            };
-            controls.appendChild(btn);
-          }
-          // THERMOSTAT/TEMP
-          else if(["thermostat","temperature_sensor"].includes(d.type)){
-            const btnDown = document.createElement("button");
-            btnDown.className="control-btn";
-            btnDown.textContent="❄️ -";
-            btnDown.onclick = ()=>{ 
-              if(d.value > 16) d.value--; 
-              saveData("smart_home_v2", smartHome); 
-              renderRooms(); 
-              log(`🌡️ ${d.label} set to ${d.value}°C`); 
-            };
-            
-            const btnUp = document.createElement("button");
-            btnUp.className="control-btn";
-            btnUp.textContent="🔥 +";
-            btnUp.onclick = ()=>{ 
-              if(d.value < 30) d.value++; 
-              saveData("smart_home_v2", smartHome); 
-              renderRooms(); 
-              log(`🌡️ ${d.label} set to ${d.value}°C`); 
-            };
-            
-            controls.appendChild(btnDown);
-            controls.appendChild(btnUp);
-          }
-        }
-      }
-
+      attachDeviceControls();
       populateRuleBuilder();
     } catch(e){ 
       console.error("renderRooms error:", e); 
       log("⚠️ Error rendering rooms: " + e.message, "danger"); 
+    }
+  }
+
+  // ---------- Attach Device Controls ----------
+  function attachDeviceControls(){
+    for(const room of smartHome.home.rooms){
+      for(const d of room.devices){
+        const controls = document.getElementById(`controls_${d.id}`);
+        if(!controls) continue;
+        controls.innerHTML = "";
+        
+        // LIGHT
+        if(d.type==="light"){
+          const colorWrap = document.createElement("div");
+          const color = document.createElement("input");
+          color.type="color";
+          color.value = d.color || "#ffd6a5";
+          color.oninput = ()=>{ 
+            d.color = color.value; 
+            saveData("smart_home_v3", smartHome); 
+            renderRooms(); 
+            log(`💡 ${d.label} color changed`); 
+          };
+          colorWrap.appendChild(color);
+          
+          const sliderWrap = document.createElement("div");
+          sliderWrap.className = "control-slider";
+          const bright = document.createElement("input");
+          bright.type="range";
+          bright.min=0;
+          bright.max=100;
+          bright.value = d.brightness || 0;
+          bright.oninput = ()=>{ 
+            d.brightness = Number(bright.value); 
+            d.state = d.brightness>0 ? "on" : "off"; 
+            saveData("smart_home_v3", smartHome); 
+            renderRooms(); 
+            log(`💡 ${d.label} brightness ${d.brightness}%`); 
+          };
+          sliderWrap.appendChild(bright);
+          
+          const toggle = document.createElement("button");
+          toggle.className = d.state==="on" ? "control-btn success" : "control-btn";
+          toggle.textContent = d.state==="on" ? "On" : "Off";
+          toggle.onclick = ()=>{ 
+            d.state = d.state==="on" ? "off" : "on"; 
+            if(d.state==="on" && d.brightness===0) d.brightness=80; 
+            saveData("smart_home_v3", smartHome); 
+            renderRooms(); 
+            log(`💡 ${d.label} toggled ${d.state}`); 
+          };
+          
+          controls.appendChild(colorWrap);
+          controls.appendChild(sliderWrap);
+          controls.appendChild(toggle);
+        }
+        // MUSIC
+        else if(d.type==="music_player"){
+          const sliderWrap = document.createElement("div");
+          sliderWrap.className = "control-slider";
+          const vol = document.createElement("input");
+          vol.type="range";
+          vol.min=0;
+          vol.max=100;
+          vol.value = d.volume || 40;
+          vol.oninput = ()=>{ 
+            d.volume = Number(vol.value); 
+            saveData("smart_home_v3", smartHome); 
+            renderRooms(); 
+            log(`🔊 ${d.label} volume ${d.volume}%`); 
+          };
+          sliderWrap.appendChild(vol);
+          
+          const play = document.createElement("button");
+          play.className = d.state==="playing" ? "control-btn success" : "control-btn";
+          play.textContent = d.state==="playing" ? "⏸ Pause" : "▶️ Play";
+          play.onclick = ()=>{ 
+            d.state = d.state==="playing" ? "paused" : "playing"; 
+            saveData("smart_home_v3", smartHome); 
+            renderRooms(); 
+            log(`🎵 ${d.label} ${d.state}`); 
+          };
+          
+          controls.appendChild(sliderWrap);
+          controls.appendChild(play);
+        }
+        // MOTION
+        else if(d.type==="motion_sensor"){
+          const btn = document.createElement("button");
+          btn.className="control-btn primary";
+          btn.textContent="Test Motion";
+          btn.onclick = ()=>{ 
+            d.state="active"; 
+            saveData("smart_home_v3", smartHome); 
+            renderRooms(); 
+            simulateEvent(d.id,"motion_detected"); 
+            showToast("Motion Detected", `${d.label} detected movement`, "warning");
+            setTimeout(()=>{ 
+              d.state="idle"; 
+              saveData("smart_home_v3", smartHome); 
+              renderRooms(); 
+              simulateEvent(d.id,"no_motion_5m"); 
+            },5000); 
+            log(`👣 Motion simulated at ${d.label}`, "warning"); 
+          };
+          controls.appendChild(btn);
+        }
+        // SMOKE
+        else if(d.type==="smoke_detector"){
+          const btn = document.createElement("button");
+          btn.className="control-btn danger";
+          btn.textContent="🚨 Test Alarm";
+          btn.onclick = ()=>{ 
+            d.state="smoke"; 
+            saveData("smart_home_v3", smartHome); 
+            renderRooms(); 
+            simulateEvent(d.id,"smoke_detected"); 
+            showToast("Smoke Detected!", "Emergency alarm triggered", "danger");
+            setTimeout(()=>{ 
+              d.state="clear"; 
+              saveData("smart_home_v3", smartHome); 
+              renderRooms(); 
+            },8000); 
+            log(`🔥 Smoke alarm triggered at ${d.label}`, "danger"); 
+          };
+          controls.appendChild(btn);
+        }
+        // LEAK DETECTOR
+        else if(d.type==="leak_detector"){
+          const btn = document.createElement("button");
+          btn.className="control-btn danger";
+          btn.textContent="💧 Test Leak";
+          btn.onclick = ()=>{ 
+            d.state="leak"; 
+            saveData("smart_home_v3", smartHome); 
+            renderRooms(); 
+            simulateEvent(d.id,"leak_detected"); 
+            showToast("Water Leak!", `Leak detected at ${d.label}`, "danger");
+            setTimeout(()=>{ 
+              d.state="ok"; 
+              saveData("smart_home_v3", smartHome); 
+              renderRooms(); 
+            },8000); 
+            log(`💧 Leak detected at ${d.label}`, "danger"); 
+          };
+          controls.appendChild(btn);
+        }
+        // SMART LOCK
+        else if(d.type==="smart_lock"){
+          const btn = document.createElement("button");
+          const isLocked = d.state==="locked";
+          btn.className = isLocked ? "control-btn success" : "control-btn danger";
+          btn.textContent = isLocked ? "🔒 Locked" : "🔓 Unlocked";
+          btn.onclick = ()=>{ 
+            d.state = isLocked ? "unlocked" : "locked"; 
+            saveData("smart_home_v3", smartHome); 
+            renderRooms(); 
+            simulateEvent(d.id, isLocked ? "door_opened" : "door_closed");
+            showToast(isLocked ? "Door Unlocked" : "Door Locked", d.label, isLocked ? "warning" : "success");
+            log(`🔐 ${d.label} ${d.state}`); 
+          };
+          controls.appendChild(btn);
+        }
+        // CAMERA
+        else if(d.type==="camera"){
+          const btn = document.createElement("button");
+          btn.className="control-btn primary";
+          btn.textContent="📹 View Feed";
+          btn.onclick = ()=>{ 
+            showToast("Camera Feed", `Viewing ${d.label}`, "info");
+            log(`📹 Viewing ${d.label}`); 
+          };
+          const btn2 = document.createElement("button");
+          btn2.className="control-btn";
+          btn2.textContent="Test Motion";
+          btn2.onclick = ()=>{ 
+            d.state="motion"; 
+            saveData("smart_home_v3", smartHome); 
+            renderRooms(); 
+            showToast("Motion Detected", `${d.label} detected movement`, "warning");
+            setTimeout(()=>{ 
+              d.state="idle"; 
+              saveData("smart_home_v3", smartHome); 
+              renderRooms(); 
+            },5000); 
+            log(`📹 ${d.label} motion detected`, "warning"); 
+          };
+          controls.appendChild(btn);
+          controls.appendChild(btn2);
+        }
+        // GARAGE DOOR
+        else if(d.type==="garage_door"){
+          const btn = document.createElement("button");
+          const isClosed = d.state==="closed";
+          btn.className = isClosed ? "control-btn" : "control-btn success";
+          btn.textContent = isClosed ? "Open" : "Close";
+          btn.onclick = ()=>{ 
+            d.state = isClosed ? "open" : "closed"; 
+            saveData("smart_home_v3", smartHome); 
+            renderRooms(); 
+            showToast("Garage Door", `${d.label} ${d.state}`, "info");
+            log(`🚗 ${d.label} ${d.state}`); 
+          };
+          controls.appendChild(btn);
+        }
+        // FAN
+        else if(d.type==="fan"){
+          const btn = document.createElement("button");
+          btn.className = d.state==="on" ? "control-btn success" : "control-btn";
+          btn.textContent = d.state==="on" ? "Turn Off" : "Turn On";
+          btn.onclick = ()=>{ 
+            d.state = d.state==="on" ? "off" : "on"; 
+            if(d.state==="on") d.speed = 2;
+            else d.speed = 0;
+            saveData("smart_home_v3", smartHome); 
+            renderRooms(); 
+            log(`💨 ${d.label} ${d.state}`); 
+          };
+          controls.appendChild(btn);
+        }
+        // TV
+        else if(d.type==="tv"){
+          const btn = document.createElement("button");
+          btn.className = d.state==="on" ? "control-btn success" : "control-btn";
+          btn.textContent = d.state==="on" ? "Turn Off" : "Turn On";
+          btn.onclick = ()=>{ 
+            d.state = d.state==="on" ? "off" : "on"; 
+            saveData("smart_home_v3", smartHome); 
+            renderRooms(); 
+            log(`📺 ${d.label} ${d.state}`); 
+          };
+          controls.appendChild(btn);
+        }
+        // APPLIANCE/PLUG/BLINDS/SPRINKLER
+        else if(["appliance","smart_plug","blinds","sprinkler"].includes(d.type)){
+          const btn = document.createElement("button");
+          const isOn = (d.state==="on"||d.state==="open");
+          btn.className = isOn ? "control-btn success" : "control-btn";
+          btn.textContent = isOn ? "Turn Off" : "Turn On";
+          btn.onclick = ()=>{ 
+            d.state = isOn ? (d.type==="blinds" ? "closed" : "off") : (d.type==="blinds" ? "open" : "on"); 
+            saveData("smart_home_v3", smartHome); 
+            renderRooms(); 
+            log(`${deviceIcon(d.type)} ${d.label} ${d.state}`); 
+          };
+          controls.appendChild(btn);
+        }
+        // THERMOSTAT/TEMP
+        else if(["thermostat","temperature_sensor"].includes(d.type)){
+          const btnDown = document.createElement("button");
+          btnDown.className="control-btn";
+          btnDown.textContent="❄️ -";
+          btnDown.onclick = ()=>{ 
+            if(d.value > 16) d.value--; 
+            saveData("smart_home_v3", smartHome); 
+            renderRooms(); 
+            log(`🌡️ ${d.label} set to ${d.value}°C`); 
+          };
+          
+          const btnUp = document.createElement("button");
+          btnUp.className="control-btn";
+          btnUp.textContent="🔥 +";
+          btnUp.onclick = ()=>{ 
+            if(d.value < 30) d.value++; 
+            saveData("smart_home_v3", smartHome); 
+            renderRooms(); 
+            log(`🌡️ ${d.label} set to ${d.value}°C`); 
+          };
+          
+          controls.appendChild(btnDown);
+          controls.appendChild(btnUp);
+        }
+        // AIR QUALITY
+        else if(d.type==="air_quality"){
+          const btn = document.createElement("button");
+          btn.className="control-btn";
+          btn.textContent="Refresh";
+          btn.onclick = ()=>{ 
+            const qualities = ["good", "moderate", "poor"];
+            d.value = qualities[Math.floor(Math.random() * qualities.length)];
+            saveData("smart_home_v3", smartHome); 
+            renderRooms(); 
+            log(`🌬️ ${d.label} updated: ${d.value}`); 
+          };
+          controls.appendChild(btn);
+        }
+      }
     }
   }
 
@@ -1076,12 +1647,13 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       if(action.set){ 
         Object.assign(device, action.set); 
-        saveData("smart_home_v2", smartHome); 
+        saveData("smart_home_v3", smartHome); 
         renderRooms(); 
         log(`🔧 ${device.label||device.id} updated`, "success"); 
       }
     } else if(action.alert){
       log(action.alert, "danger");
+      showToast("Alert!", action.alert, "danger");
     }
   }
 
@@ -1103,6 +1675,8 @@ document.addEventListener("DOMContentLoaded", () => {
         
         if(condOk){
           log(`⚙️ Rule triggered: ${rule.name}`, "success");
+          stats.automationsTriggered++;
+          saveData("smart_stats", stats);
           for(const a of rule.actions) applyActionObj(a);
         } else {
           log(`Rule ${rule.name} skipped (condition not met)`);
@@ -1122,7 +1696,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const actionValueRaw = rbActionValue.value.trim();
       
       if(!triggerDevice || !triggerEvent || !actionDevice || !actionType || !actionValueRaw){ 
-        alert("Please fill in all fields"); 
+        showToast("Missing Fields", "Please fill in all fields", "warning");
         return; 
       }
 
@@ -1160,19 +1734,21 @@ document.addEventListener("DOMContentLoaded", () => {
       };
       
       userRules.push(newRule);
-      saveData("smart_rules_v2", userRules);
+      saveData("smart_rules_v3", userRules);
       renderRules();
       log(`➕ Created rule: ${newRule.name}`, "success");
+      showToast("Rule Created", `${newRule.name} has been added`, "success");
       rbActionValue.value = "";
     } catch(e){ 
       console.error("rb_add error:", e); 
-      alert("Error creating rule: "+e.message); 
+      showToast("Error", "Failed to create rule: " + e.message, "danger");
     }
   });
 
   document.getElementById("rb_save").addEventListener("click", ()=>{ 
-    saveData("smart_rules_v2", userRules); 
+    saveData("smart_rules_v3", userRules); 
     log("💾 Rules saved to storage", "success"); 
+    showToast("Rules Saved", "All automation rules have been saved", "success");
   });
 
   function renderRules(){
@@ -1201,15 +1777,122 @@ document.addEventListener("DOMContentLoaded", () => {
       rm.textContent="Remove";
       rm.onclick = ()=>{ 
         userRules.splice(i,1); 
-        saveData("smart_rules_v2", userRules); 
+        saveData("smart_rules_v3", userRules); 
         renderRules(); 
         log(`🗑️ Removed ${r.name}`, "warning"); 
+        showToast("Rule Removed", `${r.name} has been deleted`, "info");
       };
       
       div.appendChild(content);
       div.appendChild(rm);
       rulesList.appendChild(div);
     });
+  }
+
+  // ---------- Scenarios ----------
+  document.querySelectorAll('.scenario-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const scenario = card.getAttribute('data-scenario');
+      runScenario(scenario);
+    });
+  });
+
+  function runScenario(scenario){
+    log(`🎬 Running scenario: ${scenario}`, "success");
+    
+    if(scenario === "movie"){
+      showToast("Movie Time", "Setting up the perfect viewing environment", "info");
+      applyActionObj({device:"light_livingroom", set:{state:"on", brightness:20}});
+      applyActionObj({device:"blinds_master", set:{state:"closed"}});
+      applyActionObj({device:"tv_livingroom", set:{state:"on"}});
+      applyActionObj({device:"music_livingroom", set:{state:"paused"}});
+    }
+    else if(scenario === "dinner"){
+      showToast("Dinner Mode", "Creating a cozy dining atmosphere", "info");
+      applyActionObj({device:"light_livingroom", set:{state:"on", brightness:60, color:"#ffd6a5"}});
+      applyActionObj({device:"light_entry", set:{state:"on", brightness:40}});
+      applyActionObj({device:"music_livingroom", set:{state:"playing", volume:30}});
+    }
+    else if(scenario === "wfh"){
+      showToast("Work From Home", "Setting up your office", "info");
+      applyActionObj({device:"light_office", set:{state:"on", brightness:100}});
+      applyActionObj({device:"music_office", set:{state:"playing", volume:25}});
+      applyActionObj({device:"plug_office", set:{state:"on"}});
+    }
+    else if(scenario === "sleep"){
+      showToast("Bedtime", "Good night! Securing the house", "info");
+      smartHome.home.rooms.flatMap(r=>r.devices).forEach(d=>{
+        if(d.type==="light") applyActionObj({device:d.id, set:{state:"off"}});
+        if(d.type==="music_player") applyActionObj({device:d.id, set:{state:"paused"}});
+        if(d.type==="smart_lock") applyActionObj({device:d.id, set:{state:"locked"}});
+        if(d.type==="tv") applyActionObj({device:d.id, set:{state:"off"}});
+      });
+    }
+    else if(scenario === "arrive"){
+      showToast("Welcome Home", "Preparing your arrival", "success");
+      applyActionObj({device:"lock_front", set:{state:"unlocked"}});
+      applyActionObj({device:"light_entry", set:{state:"on", brightness:100}});
+      applyActionObj({device:"light_livingroom", set:{state:"on", brightness:80}});
+      applyActionObj({device:"thermostat_master", set:{value:22}});
+    }
+    else if(scenario === "party"){
+      showToast("Party Mode", "Let's celebrate! 🎉", "success");
+      smartHome.home.rooms.flatMap(r=>r.devices).forEach(d=>{
+        if(d.type==="light") applyActionObj({device:d.id, set:{state:"on", brightness:100}});
+        if(d.type==="music_player") applyActionObj({device:d.id, set:{state:"playing", volume:70}});
+      });
+    }
+    else if(scenario === "vacation"){
+      showToast("Vacation Mode", "House secured for your trip", "info");
+      smartHome.home.rooms.flatMap(r=>r.devices).forEach(d=>{
+        if(d.type==="smart_lock") applyActionObj({device:d.id, set:{state:"locked"}});
+        if(d.type==="light" && Math.random() > 0.5) applyActionObj({device:d.id, set:{state:"on", brightness:50}});
+        if(d.type==="thermostat") applyActionObj({device:d.id, set:{value:18}});
+      });
+    }
+    else if(scenario === "alloff"){
+      showToast("All Off", "Turning off all devices", "info");
+      smartHome.home.rooms.flatMap(r=>r.devices).forEach(d=>{
+        if(["light","music_player","appliance","smart_plug","tv","fan"].includes(d.type)){
+          applyActionObj({device:d.id, set:{state:"off"}});
+        }
+      });
+    }
+  }
+
+  // ---------- Stats ----------
+  function updateStats(){
+    let activeDevices = 0;
+    let totalDevices = 0;
+    let totalEnergy = 0;
+    let tempReadings = [];
+    
+    smartHome.home.rooms.flatMap(r=>r.devices).forEach(d=>{
+      totalDevices++;
+      
+      if(d.state === "on" || d.state === "playing" || d.state === "open" || d.state === "unlocked"){
+        activeDevices++;
+      }
+      
+      // Estimate energy
+      if(d.type === "light" && d.state === "on") totalEnergy += 0.01 * (d.brightness || 50);
+      if(d.type === "music_player" && d.state === "playing") totalEnergy += 0.05;
+      if(d.type === "tv" && d.state === "on") totalEnergy += 0.15;
+      if(d.type === "appliance" && d.state === "on") totalEnergy += 1.2;
+      if(d.type === "thermostat") totalEnergy += 2.5;
+      
+      if((d.type === "temperature_sensor" || d.type === "thermostat") && d.value){
+        tempReadings.push(d.value);
+      }
+    });
+    
+    const avgTemp = tempReadings.length > 0 ? (tempReadings.reduce((a,b)=>a+b,0) / tempReadings.length).toFixed(1) : 0;
+    
+    document.getElementById("statActiveDevices").textContent = activeDevices;
+    document.getElementById("statTotalDevices").textContent = totalDevices;
+    document.getElementById("statEnergy").textContent = totalEnergy.toFixed(1);
+    document.getElementById("statAutomations").textContent = stats.automationsTriggered;
+    document.getElementById("statTemp").textContent = avgTemp;
   }
 
   // ---------- Modes ----------
@@ -1230,25 +1913,30 @@ document.addEventListener("DOMContentLoaded", () => {
   function runMode(mode){
     setModeButtons(mode);
     log(`⚡ Running ${mode} mode`, "success");
+    showToast(`${mode} Mode`, `Activating ${mode} routine`, "success");
     
     if(mode==="Morning"){
-      applyActionObj({device:"lamp_bedroom", set:{state:"on", brightness:70}});
-      applyActionObj({device:"blinds_bedroom", set:{state:"open"}});
-      applyActionObj({device:"music_bedroom", set:{state:"playing", volume:40}});
+      applyActionObj({device:"lamp_master", set:{state:"on", brightness:70}});
+      applyActionObj({device:"blinds_master", set:{state:"open"}});
+      applyActionObj({device:"music_master", set:{state:"playing", volume:40}});
       applyActionObj({device:"coffee_maker", set:{state:"on"}});
-      log("☀️ Good morning! Starting your day...", "success");
+      applyActionObj({device:"thermostat_master", set:{value:22}});
+      applyActionObj({device:"light_bathroom", set:{state:"on", brightness:100}});
     } else if(mode==="Night"){
       applyActionObj({device:"light_livingroom", set:{state:"on", brightness:20}});
-      applyActionObj({device:"lamp_bedroom", set:{state:"off", brightness:0}});
+      applyActionObj({device:"lamp_master", set:{state:"off", brightness:0}});
+      applyActionObj({device:"nightlight_kids", set:{state:"on", brightness:20}});
       applyActionObj({device:"music_livingroom", set:{state:"paused"}});
-      log("🌙 Night mode activated. Sleep well!", "success");
+      applyActionObj({device:"lock_front", set:{state:"locked"}});
+      applyActionObj({device:"thermostat_master", set:{value:19}});
     } else if(mode==="Away"){
       smartHome.home.rooms.flatMap(r=>r.devices).forEach(d=>{
-        if(["light","music_player","appliance","smart_plug"].includes(d.type)){ 
+        if(["light","music_player","appliance","smart_plug","tv","fan"].includes(d.type)){ 
           applyActionObj({device:d.id, set:{state:"off"}}); 
         }
+        if(d.type==="smart_lock") applyActionObj({device:d.id, set:{state:"locked"}});
+        if(d.type==="thermostat") applyActionObj({device:d.id, set:{value:18}});
       });
-      log("🔒 Away mode: All devices secured", "success");
     }
   }
 
@@ -1262,14 +1950,15 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(()=>{ 
           m.state="idle"; 
           simulateEvent(m.id,"no_motion_5m"); 
-          saveData("smart_home_v2", smartHome); 
+          saveData("smart_home_v3", smartHome); 
           renderRooms(); 
         },5000); 
       }
     });
-    saveData("smart_home_v2", smartHome);
+    saveData("smart_home_v3", smartHome);
     renderRooms();
     log("👣 Motion simulated in all rooms", "warning");
+    showToast("Motion Detected", "Testing all motion sensors", "warning");
   });
 
   document.getElementById("btnSimSmoke").addEventListener("click", ()=> {
@@ -1279,13 +1968,31 @@ document.addEventListener("DOMContentLoaded", () => {
       simulateEvent(s.id,"smoke_detected"); 
       setTimeout(()=>{ 
         s.state="clear"; 
-        saveData("smart_home_v2", smartHome); 
+        saveData("smart_home_v3", smartHome); 
         renderRooms(); 
       },8000); 
     }
-    saveData("smart_home_v2", smartHome);
+    saveData("smart_home_v3", smartHome);
     renderRooms();
     log("🔥 Smoke alarm test initiated", "danger");
+    showToast("Smoke Detected!", "Emergency alarm system test", "danger");
+  });
+
+  document.getElementById("btnTestLeak").addEventListener("click", ()=> {
+    const leak = findDeviceById("leak_kitchen") || findDeviceById("leak_bathroom");
+    if(leak){ 
+      leak.state="leak"; 
+      simulateEvent(leak.id,"leak_detected"); 
+      setTimeout(()=>{ 
+        leak.state="ok"; 
+        saveData("smart_home_v3", smartHome); 
+        renderRooms(); 
+      },8000); 
+    }
+    saveData("smart_home_v3", smartHome);
+    renderRooms();
+    log("💧 Leak sensor test initiated", "danger");
+    showToast("Water Leak!", "Testing leak detection system", "danger");
   });
 
   document.getElementById("btnClearLog").addEventListener("click", ()=> clearLogs());
@@ -1304,17 +2011,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---------- Init ----------
   function init(){
     try {
-      if(!loadData("smart_home_v2")) saveData("smart_home_v2", smartHome);
-      if(!loadData("smart_rules_v2")) saveData("smart_rules_v2", userRules);
+      if(!loadData("smart_home_v3")) saveData("smart_home_v3", smartHome);
+      if(!loadData("smart_rules_v3")) saveData("smart_rules_v3", userRules);
 
       renderRooms();
       renderRules();
+      updateStats();
       setModeButtons("Home");
       log("🏠 Smart Haven initialized", "success");
+      showToast("Welcome to Smart Haven", "Your smart home is ready", "success");
       
       // Periodic save
       setInterval(()=>{ 
-        saveData("smart_home_v2", smartHome); 
+        saveData("smart_home_v3", smartHome); 
       }, 4000);
     } catch(e){ 
       console.error("init error:", e); 
